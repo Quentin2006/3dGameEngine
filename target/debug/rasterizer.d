@@ -1,1 +1,1 @@
-/home/qscheetz/Documents/Rasterizer/target/debug/rasterizer: /home/qscheetz/Documents/Rasterizer/src/main.rs
+/home/qscheetz/Documents/3dGameEngine/target/debug/rasterizer: /home/qscheetz/Documents/3dGameEngine/src/main.rs /home/qscheetz/Documents/3dGameEngine/src/models/color.rs /home/qscheetz/Documents/3dGameEngine/src/models/mod.rs /home/qscheetz/Documents/3dGameEngine/src/models/triangle.rs /home/qscheetz/Documents/3dGameEngine/src/models/vec2.rs /home/qscheetz/Documents/3dGameEngine/src/models/vec3.rs /home/qscheetz/Documents/3dGameEngine/src/rasterizer.rs

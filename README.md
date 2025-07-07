@@ -13,15 +13,42 @@
 - I plan to do weekly check-in's every Sunday, this will summarize what I
   learned, and what I'm working on for the whole week.
 
-### 📅 Day 0
+## 📅 Day 0
 
 This is just a small little summer project. I want to learn some rust
 programming, so I've decided to make a 3d render.
+
 I plan to do weekly updates, and I'm deeming this "Day 0". This is mainly so
 I can be held accountable for working on this project,
 and make it easier for me to start.
 
-#### 🔜 Next Week
+### 🔜 Week 1 hopes
 
-Learn about the basics of rust. Set up a rust project, and get it compiling.
-Try and render something to the screen.
+- Learn the basics of Rust
+
+- Set up a Rust project and get it compiling
+
+- Try rendering something to the screen
+
+## 📅 Week 1
+
+This week, I covered some of the rust docs, just enough to actualy get started.
+I made very good progress today, I implemented a very crude implementaion
+of a rasterizer.
+
+I will improve this, but currently you can add a triangle
+into world space and it renders!
+
+The last thing I was working on was getting barycentric interpolation working,
+but for some reason v2 is showing as green, when it should be blue.
+So I got to look into that a bit more.
+
+### 🔜 Week 2 hopes
+
+- Finish barycentric interpolation
+
+- Read more of the Rust docs
+
+- Clean up the code using operator overloading
+
+- Add a z-buffer for proper depth handling
