@@ -52,3 +52,21 @@ So I got to look into that a bit more.
 - Clean up the code using operator overloading
 
 - Add a z-buffer for proper depth handling
+
+## 📅 Week 2 (ish)
+
+I got a little busy with work and life, so I couldnt find the time to
+work on this last week or this week. I did do one small bug fix,
+so now, the triangle actualy gets rendered proper on screen! The issue
+was in the draw function. I was acessing the indicies in my raster
+improperly.
+
+### Week 3 hopes (same as week 2 hopes)
+
+- Finish barycentric interpolation
+
+- Read more of the Rust docs
+
+- Clean up the code using operator overloading
+
+- Add a z-buffer for proper depth handling

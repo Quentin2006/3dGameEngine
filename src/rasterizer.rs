@@ -1,71 +1,83 @@
 use crate::models::color::Color;
 use crate::models::triangle::Triangle;
 use crate::models::vec2::Vec2;
-use crate::models::vec3::Vec3;
 
-pub const WIDTH: usize = 3440;
-pub const HEIGHT: usize = 1440;
+use crate::WIDTH;
 
-pub fn draw_pixel(buffer: &mut [u32], x: usize, y: usize, color: u32) {
-    if x >= WIDTH || y >= HEIGHT {
-        return;
-    }
+struct BoundingBoxData(usize, usize, usize, usize);
 
-    buffer[y * WIDTH + x] = color;
-}
+pub fn draw_triangle(raster: &mut [u32], tri: Triangle) {
+    let (projected_v0, projected_v1, projected_v2): (Vec2, Vec2, Vec2) = project_triangle(tri);
 
-pub fn project_vertex(v: Vec3) -> Vec2 {
-    Vec2::new(v.x, v.y)
-}
+    let BoundingBoxData(min_x, min_y, max_x, max_y): BoundingBoxData =
+        bounding_box(projected_v0, projected_v1, projected_v2);
 
-pub fn edge_check(v0: Vec2, v1: Vec2, p: Vec2) -> f32 {
-    let u: Vec2 = v1.subtract(&v0);
-    let v: Vec2 = p.subtract(&v0);
-    u.cross(&v)
-}
-
-pub fn point_in_triangle(v0: Vec2, v1: Vec2, v2: Vec2, p: Vec2) -> bool {
-    let e0 = edge_check(v1, v0, p);
-    let e1 = edge_check(v1, v2, p);
-    let e2 = edge_check(v2, v0, p);
-    (e0 >= 0.0 && e1 >= 0.0 && e2 >= 0.0) || (e0 <= 0.0 && e1 <= 0.0 && e2 <= 0.0)
-}
-
-pub fn draw_triangle(buffer: &mut [u32], tri: &Triangle, color: u32) {
-    // project the vertices of the triangle
-    let v0 = project_vertex(tri.v0);
-    let v1 = project_vertex(tri.v1);
-    let v2 = project_vertex(tri.v2);
-
-    // get bounding box of the triangle
-    let min_x = v0.x.min(v1.x).min(v2.x).floor().max(0.0) as usize;
-    let max_x = v0.x.max(v1.x).max(v2.x).ceil().min((WIDTH - 1) as f32) as usize;
-    let min_y = v0.y.min(v1.y).min(v2.y).floor().max(0.0) as usize;
-    let max_y = v0.y.max(v1.y).max(v2.y).ceil().min((HEIGHT - 1) as f32) as usize;
-
-    // create colors for the vertices
-    let c0 = Color::new(255, 0, 0); // red at v0
-    let c1 = Color::new(0, 255, 0); // green at v1
-    let c2 = Color::new(0, 0, 255); // blue at v2
-
-    let area = edge_check(v0, v1, v2);
-
-    // draw the triangle by iterating over the bounding box
     for x in min_x..=max_x {
         for y in min_y..=max_y {
-            // move point to the center of the pixel
-            let p = Vec2::new(x as f32 + 0.5, y as f32 + 0.5);
-            if point_in_triangle(v0, v1, v2, p) {
-                let w0 = edge_check(v1, v2, p).abs() / area;
-                let w1 = edge_check(v2, v0, p).abs() / area;
-                let w2 = edge_check(v0, v1, p).abs() / area;
-
-                let r = (w0 * c0.r as f32 + w1 * c1.r as f32 + w2 * c2.r as f32) as u8;
-                let g = (w0 * c0.g as f32 + w1 * c1.g as f32 + w2 * c2.g as f32) as u8;
-                let b = (w0 * c0.b as f32 + w1 * c1.b as f32 + w2 * c2.b as f32) as u8;
-
-                draw_pixel(buffer, x, y, Color::new(r, g, b).to_u32());
+            if point_in_triangle(x, y, (projected_v0, projected_v1, projected_v2)) {
+                draw_pixel(x, y, raster);
             }
         }
     }
+}
+
+/// will project the given trianlge into screen space
+/// currently only does orthogaphic projection
+///
+/// * `tri`: triangle to be projected
+fn project_triangle(tri: Triangle) -> (Vec2, Vec2, Vec2) {
+    (
+        Vec2::new(tri.v0.x, tri.v0.y),
+        Vec2::new(tri.v1.x, tri.v1.y),
+        Vec2::new(tri.v2.x, tri.v2.y),
+    )
+}
+
+/// will calculate the bounding box of the given triangle
+///
+/// * `v0`: vertex of triangle
+/// * `v1`: vertex of triangle
+/// * `v2`: vertex of triangle
+fn bounding_box(v0: Vec2, v1: Vec2, v2: Vec2) -> BoundingBoxData {
+    let min_x = f32::min(f32::min(v0.x, v1.x), v2.x) as usize;
+    let min_y = f32::min(f32::min(v0.y, v1.y), v2.y) as usize;
+    let max_x = f32::max(f32::max(v0.x, v1.x), v2.x) as usize;
+    let max_y = f32::max(f32::max(v0.y, v1.y), v2.y) as usize;
+
+    BoundingBoxData(min_x, min_y, max_x, max_y)
+}
+
+/// will check if a point is in the triangle
+///
+/// * `x`: x value of point
+/// * `y`: y value of point
+fn point_in_triangle(
+    x: usize,
+    y: usize,
+    (projected_v0, projected_v1, projected_v2): (Vec2, Vec2, Vec2),
+) -> bool {
+    // we know if a point is in the triangle if its to the right of each vector
+    let right_of_v01 = is_to_left(x, y, projected_v0, projected_v1);
+    let right_of_v12 = is_to_left(x, y, projected_v1, projected_v2);
+    let right_of_v20 = is_to_left(x, y, projected_v2, projected_v0);
+    right_of_v01 && right_of_v12 && right_of_v20
+}
+
+/// determines if a point is to the left of a vector
+///
+/// * `x`: x value of point
+/// * `y`: y value of point
+/// * `v0`: vector start
+/// * `v1`: vector end
+fn is_to_left(x: usize, y: usize, v0: Vec2, v1: Vec2) -> bool {
+    (v1.x - v0.x) * (y as f32 - v0.y) - (v1.y - v0.y) * (x as f32 - v0.x) >= 0.0
+}
+
+/// will draw a pixel to the specified (x,y) values in the passed raster
+///
+/// * `x`: x value to write
+/// * `y`: y value to write
+/// * `raster`: raster to write to
+fn draw_pixel(x: usize, y: usize, raster: &mut [u32]) {
+    raster[y * WIDTH + x] = Color::new(255, 255, 255).to_u32();
 }

@@ -1,50 +1,30 @@
-use minifb::{Window, WindowOptions};
-
 mod models;
 use models::color::Color;
 use models::triangle::Triangle;
 use models::vec3::Vec3;
 
 mod rasterizer;
-use rasterizer::*;
+mod window;
 
-pub fn clear_buffer(buffer: &mut [u32], color: u32) {
-    for pixel in buffer.iter_mut() {
-        *pixel = color;
-    }
-}
+pub const WIDTH: usize = 128;
+pub const HEIGHT: usize = 128;
 
 fn main() {
-    let color = Color::new(0, 0, 0);
-    let tri_color = Color::new(255, 0, 0);
+    let black = Color::new(0, 0, 0);
 
-    let mut raster: Vec<u32> = vec![color.to_u32(); WIDTH * HEIGHT];
-
-    let mut window = Window::new(
-        "3d Render",
-        WIDTH,
-        HEIGHT,
-        WindowOptions {
-            resize: true,
-            ..WindowOptions::default()
-        },
-    )
-    .unwrap();
+    let window::InitWindowResult(mut window, mut raster): window::InitWindowResult =
+        window::init_window(WIDTH, HEIGHT, black.to_u32());
 
     // NOTE: the tranagle must be made in CCW order
-    let mut tri = Triangle::new(
-        Vec3::new(100.0, 100.0, 0.0),
-        Vec3::new(500.0, 300.0, 0.0),
-        Vec3::new(1000.0, 1000.0, 0.0),
+    let tri = Triangle::new(
+        Vec3::new(112.0, 81.0, 0.0),
+        Vec3::new(19.0, 104.0, 0.0),
+        Vec3::new(18.0, 16.0, 0.0),
     );
+
     while window.is_open() {
-        tri.add(
-            Vec3::new(1.0, 0.0, 0.0),
-            Vec3::new(1.0, 0.0, 0.0),
-            Vec3::new(1.0, 0.0, 0.0),
-        );
-        clear_buffer(&mut raster, color.to_u32());
-        draw_triangle(&mut raster, &tri, tri_color.to_u32());
+        window::clear_raster(&mut raster, black.to_u32());
+        rasterizer::draw_triangle(&mut raster, tri);
 
         window.update_with_buffer(&raster, WIDTH, HEIGHT).unwrap();
     }
