@@ -1,3 +1,5 @@
+use rand::prelude::*;
+
 #[derive(Debug, Clone, Copy)]
 pub struct Vec3 {
     pub x: f32,
@@ -66,5 +68,14 @@ impl Vec3 {
             y: self.y / len,
             z: self.z / len,
         }
+    }
+
+    pub fn random(min_x: f32, min_y: f32, min_z: f32, max_x: f32, max_y: f32, max_z: f32) -> Self {
+        let mut rng = rand::rng();
+        Vec3::new(
+            rng.random_range(min_x..=max_x),
+            rng.random_range(min_y..=max_y),
+            rng.random_range(min_z..=max_z),
+        )
     }
 }

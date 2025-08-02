@@ -18,7 +18,7 @@
 This is just a small little summer project. I want to learn some rust
 programming, so I've decided to make a 3d render.
 
-I plan to do weekly updates, and I'm deeming this "Day 0". This is mainly so
+I plan to do weekly updates. This is mainly so
 I can be held accountable for working on this project,
 and make it easier for me to start.
 
