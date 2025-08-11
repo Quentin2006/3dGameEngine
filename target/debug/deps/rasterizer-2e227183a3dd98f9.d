@@ -1,10 +1,12 @@
-/home/qscheetz/Documents/3dGameEngine/target/debug/deps/rasterizer-2e227183a3dd98f9.d: src/main.rs src/models/mod.rs src/models/color.rs src/models/triangle.rs src/models/vec2.rs src/models/vec3.rs src/rasterizer.rs src/window.rs Cargo.toml
+/home/qscheetz/Documents/3dGameEngine/target/debug/deps/rasterizer-2e227183a3dd98f9.d: src/main.rs src/models/mod.rs src/models/camera.rs src/models/color.rs src/models/mat4.rs src/models/triangle.rs src/models/vec2.rs src/models/vec3.rs src/rasterizer.rs src/window.rs Cargo.toml
 
-/home/qscheetz/Documents/3dGameEngine/target/debug/deps/librasterizer-2e227183a3dd98f9.rmeta: src/main.rs src/models/mod.rs src/models/color.rs src/models/triangle.rs src/models/vec2.rs src/models/vec3.rs src/rasterizer.rs src/window.rs Cargo.toml
+/home/qscheetz/Documents/3dGameEngine/target/debug/deps/librasterizer-2e227183a3dd98f9.rmeta: src/main.rs src/models/mod.rs src/models/camera.rs src/models/color.rs src/models/mat4.rs src/models/triangle.rs src/models/vec2.rs src/models/vec3.rs src/rasterizer.rs src/window.rs Cargo.toml
 
 src/main.rs:
 src/models/mod.rs:
+src/models/camera.rs:
 src/models/color.rs:
+src/models/mat4.rs:
 src/models/triangle.rs:
 src/models/vec2.rs:
 src/models/vec3.rs:

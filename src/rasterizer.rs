@@ -62,14 +62,21 @@ fn ensure_ccw(a: Vec2, b: Vec2, c: Vec2) -> (Vec2, Vec2, Vec2) {
 }
 
 /// will project the given trianlge into screen space
-/// currently only does orthogaphic projection
+/// using basic 3d projection
 ///
 /// * `tri`: triangle to be projected
 fn project_triangle(tri: Triangle) -> (Vec2, Vec2, Vec2) {
+    const Z_NEAR: f32 = 0.1;
+    const Z_FAR: f32 = 100.0;
+
+    let z0_divisor = f32::clamp(tri.v0.z, Z_NEAR, Z_FAR);
+    let z1_divisor = f32::clamp(tri.v1.z, Z_NEAR, Z_FAR);
+    let z2_divisor = f32::clamp(tri.v2.z, Z_NEAR, Z_FAR);
+
     (
-        Vec2::new(tri.v0.x, tri.v0.y),
-        Vec2::new(tri.v1.x, tri.v1.y),
-        Vec2::new(tri.v2.x, tri.v2.y),
+        Vec2::new(tri.v0.x / z0_divisor, tri.v0.y / z0_divisor),
+        Vec2::new(tri.v1.x / z1_divisor, tri.v1.y / z1_divisor),
+        Vec2::new(tri.v2.x / z2_divisor, tri.v2.y / z2_divisor),
     )
 }
 

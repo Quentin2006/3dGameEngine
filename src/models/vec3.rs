@@ -1,4 +1,5 @@
 use rand::prelude::*;
+use std::ops::{Add, Mul, Sub};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Vec3 {
@@ -16,22 +17,6 @@ impl Vec3 {
         self.x = x;
         self.y = y;
         self.z = z;
-    }
-
-    pub fn add(&self, other: &Vec3) -> Vec3 {
-        Vec3 {
-            x: self.x + other.x,
-            y: self.y + other.y,
-            z: self.z + other.z,
-        }
-    }
-
-    pub fn subtract(&self, other: &Vec3) -> Vec3 {
-        Vec3 {
-            x: self.x - other.x,
-            y: self.y - other.y,
-            z: self.z - other.z,
-        }
     }
 
     pub fn dot(&self, other: &Vec3) -> f32 {
@@ -77,5 +62,41 @@ impl Vec3 {
             rng.random_range(min_y..=max_y),
             rng.random_range(min_z..=max_z),
         )
+    }
+}
+
+impl Sub for Vec3 {
+    type Output = Vec3;
+
+    fn sub(self, other: Vec3) -> Vec3 {
+        Vec3 {
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,
+        }
+    }
+}
+
+impl Add for Vec3 {
+    type Output = Vec3;
+
+    fn add(self, other: Vec3) -> Vec3 {
+        Vec3 {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+        }
+    }
+}
+
+impl Mul<f32> for Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, scalar: f32) -> Vec3 {
+        Vec3 {
+            x: self.x * scalar,
+            y: self.y * scalar,
+            z: self.z * scalar,
+        }
     }
 }

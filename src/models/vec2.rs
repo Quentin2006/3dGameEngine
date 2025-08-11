@@ -16,20 +16,6 @@ impl Vec2 {
         self.y = y;
     }
 
-    pub fn add(&self, other: &Vec2) -> Vec2 {
-        Vec2 {
-            x: self.x + other.x,
-            y: self.y + other.y,
-        }
-    }
-
-    pub fn subtract(&self, other: &Vec2) -> Vec2 {
-        Vec2 {
-            x: self.x - other.x,
-            y: self.y - other.y,
-        }
-    }
-
     pub fn dot(&self, other: &Vec2) -> f32 {
         self.x * other.x + self.y * other.y
     }

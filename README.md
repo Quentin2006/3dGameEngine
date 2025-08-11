@@ -70,3 +70,17 @@ improperly.
 - Clean up the code using operator overloading
 
 - Add a z-buffer for proper depth handling
+
+## 📅 Week 3
+
+Welp, again, Ive been busy with work and life, so I could not
+find a lot of time to work on this.
+I did add a camera object, and a mat 4 object as well as some very basic projection.
+However, Im getting some odd rendering issues currently due to the camera projection.
+I did however complete the barycentric interpolation.
+
+### 🔜 Week 4 hopes
+
+- Clean up the code using operator overloading
+
+- Finish the camera object allowing for user movement
