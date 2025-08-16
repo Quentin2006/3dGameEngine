@@ -1,5 +1,4 @@
 use crate::models::color;
-use crate::models::triangle::Triangle;
 use crate::models::vec2::Vec2;
 use color::Color;
 
@@ -8,22 +7,20 @@ use crate::WIDTH;
 
 struct BoundingBoxData(usize, usize, usize, usize);
 
-pub fn draw_triangle(raster: &mut [u32], tri: Triangle) {
-    // projects and ensures the triangle is counter clockwise
-    let (projected_v0, projected_v1, projected_v2): (Vec2, Vec2, Vec2) = project_triangle(tri);
-    let (projected_v0, projected_v1, projected_v2): (Vec2, Vec2, Vec2) =
-        ensure_ccw(projected_v0, projected_v1, projected_v2);
-
-    let BoundingBoxData(min_x, min_y, max_x, max_y): BoundingBoxData =
-        bounding_box(projected_v0, projected_v1, projected_v2);
+/// this fucntion will take in a tuple of vec2's and draw the triangle
+///
+/// * `raster`: raster to draw to
+/// * `(v0, v1, v2)`: tuple of vec3's to draw the triangle from
+pub fn rasterizer(raster: &mut [u32], (v0, v1, v2): (Vec2, Vec2, Vec2)) {
+    let BoundingBoxData(min_x, min_y, max_x, max_y): BoundingBoxData = bounding_box(v0, v1, v2);
 
     for x in min_x..=max_x {
         for y in min_y..=max_y {
-            if point_in_triangle(x, y, (projected_v0, projected_v1, projected_v2)) {
+            if point_in_triangle(x, y, (v0, v1, v2)) {
                 let interpolated_color = interpolate_color(
-                    projected_v0,
-                    projected_v1,
-                    projected_v2,
+                    v0,
+                    v1,
+                    v2,
                     color::RED,
                     color::GREEN,
                     color::BLUE,
@@ -34,50 +31,6 @@ pub fn draw_triangle(raster: &mut [u32], tri: Triangle) {
             }
         }
     }
-}
-
-/// checks if the given triangle is counter clockwise
-///
-/// * `a`: vertex a of the triangle in screen space
-/// * `b`: vertex b of the triangle in screen space
-/// * `c`: vertex c of the triangle in screen space
-fn is_ccw(a: Vec2, b: Vec2, c: Vec2) -> bool {
-    let ac = c - a;
-    let ab = b - a;
-    ab.cross(&ac) > 0.0
-}
-
-/// if the passed triangle is not counter clockwise, this will swap the vertices
-///
-/// * `a`: vertex a of the triangle in screen space
-/// * `b`: vertex b of the triangle in screen space
-/// * `c`: vertex c of the triangle in screen space
-fn ensure_ccw(a: Vec2, b: Vec2, c: Vec2) -> (Vec2, Vec2, Vec2) {
-    if is_ccw(a, b, c) {
-        (a, b, c)
-    } else {
-        // Swap b and c to reverse winding
-        (a, c, b)
-    }
-}
-
-/// will project the given trianlge into screen space
-/// using basic 3d projection
-///
-/// * `tri`: triangle to be projected
-fn project_triangle(tri: Triangle) -> (Vec2, Vec2, Vec2) {
-    const Z_NEAR: f32 = 0.1;
-    const Z_FAR: f32 = 100.0;
-
-    let z0_divisor = f32::clamp(tri.v0.z, Z_NEAR, Z_FAR);
-    let z1_divisor = f32::clamp(tri.v1.z, Z_NEAR, Z_FAR);
-    let z2_divisor = f32::clamp(tri.v2.z, Z_NEAR, Z_FAR);
-
-    (
-        Vec2::new(tri.v0.x / z0_divisor, tri.v0.y / z0_divisor),
-        Vec2::new(tri.v1.x / z1_divisor, tri.v1.y / z1_divisor),
-        Vec2::new(tri.v2.x / z2_divisor, tri.v2.y / z2_divisor),
-    )
 }
 
 /// will calculate the bounding box of the given triangle
