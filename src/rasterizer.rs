@@ -1,4 +1,5 @@
 use crate::models::color;
+use crate::models::triangle::Triangle;
 use crate::models::vec2::Vec2;
 use color::Color;
 
@@ -7,27 +8,43 @@ use crate::WIDTH;
 
 struct BoundingBoxData(usize, usize, usize, usize);
 
-/// this fucntion will take in a tuple of vec2's and draw the triangle
+/// this fucntion will take in a triangle that is already in screen space and draw the triangle
 ///
 /// * `raster`: raster to draw to
 /// * `(v0, v1, v2)`: tuple of vec3's to draw the triangle from
-pub fn rasterizer(raster: &mut [u32], (v0, v1, v2): (Vec2, Vec2, Vec2)) {
+pub fn rasterizer(raster: &mut [u32], tri: Triangle, z_buffer: &mut [f32]) {
+    let v0 = Vec2::new(tri.v0.x, tri.v0.y);
+    let v1 = Vec2::new(tri.v1.x, tri.v1.y);
+    let v2 = Vec2::new(tri.v2.x, tri.v2.y);
+
     let BoundingBoxData(min_x, min_y, max_x, max_y): BoundingBoxData = bounding_box(v0, v1, v2);
 
     for x in min_x..=max_x {
         for y in min_y..=max_y {
             if point_in_triangle(x, y, (v0, v1, v2)) {
-                let interpolated_color = interpolate_color(
-                    v0,
-                    v1,
-                    v2,
-                    color::RED,
-                    color::GREEN,
-                    color::BLUE,
-                    Vec2::new(x as f32, y as f32),
-                );
+                // calculate barycentric coordinates
+                let (u, v, w) = barycentric_coords(v0, v1, v2, Vec2::new(x as f32, y as f32));
 
-                draw_pixel(x, y, raster, interpolated_color);
+                // interpolate z value
+                let z = u * tri.v0.z + v * tri.v1.z + w * tri.v2.z;
+
+                // chec if point is in front of the triangle, REMOMVER, CAMERA SEES in -Z
+                // DIRECTION, so bigger vals are furether
+                if z > z_buffer[y * WIDTH + x] {
+                    // write to z buffer
+                    z_buffer[y * WIDTH + x] = z;
+
+                    let interpolated_color = interpolate_color(
+                        v0,
+                        v1,
+                        v2,
+                        color::RED,
+                        color::GREEN,
+                        color::BLUE,
+                        Vec2::new(x as f32, y as f32),
+                    );
+                    draw_pixel(x, y, raster, interpolated_color);
+                }
             }
         }
     }

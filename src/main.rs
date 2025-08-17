@@ -1,10 +1,10 @@
 mod models;
+use core::f32;
 use std::time::{Duration, Instant};
 
 use models::camera::Camera;
 use models::color::Color;
 use models::triangle::Triangle;
-use models::vec2::Vec2;
 use models::vec3::Vec3;
 
 mod rasterizer;
@@ -12,9 +12,90 @@ mod window;
 
 const WIDTH: usize = 1280;
 const HEIGHT: usize = 1280;
+fn is_front_facing(tri: &Triangle) -> bool {
+    (tri.v1.x - tri.v0.x) * (tri.v2.y - tri.v0.y) - (tri.v2.x - tri.v0.x) * (tri.v1.y - tri.v0.y)
+        > 0.0
+}
+fn make_cube() -> Vec<Triangle> {
+    let vertices = [
+        Vec3::new(-1.0, -1.0, -1.0), // 0: left-bottom-back
+        Vec3::new(1.0, -1.0, -1.0),  // 1: right-bottom-back
+        Vec3::new(1.0, 1.0, -1.0),   // 2: right-top-back
+        Vec3::new(-1.0, 1.0, -1.0),  // 3: left-top-back
+        Vec3::new(-1.0, -1.0, 1.0),  // 4: left-bottom-front
+        Vec3::new(1.0, -1.0, 1.0),   // 5: right-bottom-front
+        Vec3::new(1.0, 1.0, 1.0),    // 6: right-top-front
+        Vec3::new(-1.0, 1.0, 1.0),   // 7: left-top-front
+    ];
 
-fn is_front_facing((v0, v1, v2): &(Vec2, Vec2, Vec2)) -> bool {
-    (v1.x - v0.x) * (v2.y - v0.y) - (v2.x - v0.x) * (v1.y - v0.y) > 0.0
+    vec![
+        // Back face (-Z)  — outward normal should be -Z
+        Triangle {
+            v0: vertices[2],
+            v1: vertices[1],
+            v2: vertices[0],
+        },
+        Triangle {
+            v0: vertices[3],
+            v1: vertices[2],
+            v2: vertices[0],
+        },
+        // Front face (+Z) — outward normal +Z (CCW when viewed from +Z)
+        Triangle {
+            v0: vertices[4],
+            v1: vertices[5],
+            v2: vertices[6],
+        },
+        Triangle {
+            v0: vertices[4],
+            v1: vertices[6],
+            v2: vertices[7],
+        },
+        // Left face (-X) — outward normal -X
+        Triangle {
+            v0: vertices[0],
+            v1: vertices[4],
+            v2: vertices[7],
+        },
+        Triangle {
+            v0: vertices[0],
+            v1: vertices[7],
+            v2: vertices[3],
+        },
+        // Right face (+X) — outward normal +X
+        Triangle {
+            v0: vertices[1],
+            v1: vertices[2],
+            v2: vertices[6],
+        },
+        Triangle {
+            v0: vertices[1],
+            v1: vertices[6],
+            v2: vertices[5],
+        },
+        // Top face (+Y) — outward normal +Y
+        Triangle {
+            v0: vertices[3],
+            v1: vertices[2],
+            v2: vertices[6],
+        },
+        Triangle {
+            v0: vertices[3],
+            v1: vertices[6],
+            v2: vertices[7],
+        },
+        // Bottom face (-Y) — outward normal -Y
+        Triangle {
+            v0: vertices[0],
+            v1: vertices[1],
+            v2: vertices[5],
+        },
+        Triangle {
+            v0: vertices[0],
+            v1: vertices[5],
+            v2: vertices[4],
+        },
+    ]
 }
 
 fn main() {
@@ -23,11 +104,9 @@ fn main() {
     let window::InitWindowResult(mut window, mut raster): window::InitWindowResult =
         window::init_window(WIDTH, HEIGHT, black.to_u32());
 
-    let mut triangles: Vec<Triangle> = vec![];
+    let mut z_buffer: Vec<f32> = vec![f32::NEG_INFINITY; WIDTH * HEIGHT];
 
-    for _ in 0..10 {
-        triangles.push(Triangle::random(-0.5, -0.5, -0.5, 0.5, 0.5, 0.5));
-    }
+    let mut triangles: Vec<Triangle> = make_cube();
 
     // NOTE: this looks in the -z direction
     let mut camera = Camera::new(Vec3::new(0.0, 0.0, 0.0), 0.0, 0.0);
@@ -46,8 +125,12 @@ fn main() {
         }
         frames += 1;
 
-        // make sure buffer is cleared
+        // make sure raster and zbuffer is cleared
         window::clear_raster(&mut raster, black.to_u32());
+
+        for z in z_buffer.iter_mut() {
+            *z = f32::NEG_INFINITY;
+        }
 
         camera.get_movement(&window, prev_mouse_pos);
         prev_mouse_pos = window.get_mouse_pos(minifb::MouseMode::Discard);
@@ -57,6 +140,11 @@ fn main() {
         for tri in triangles.iter_mut() {
             // apply camera transformation
             let tri_view = tri.transform(view);
+
+            // skip triangles behind camera
+            if tri.v0.z >= 0.0 || tri_view.v1.z >= 0.0 || tri_view.v2.z >= 0.0 {
+                continue;
+            }
 
             // apply basic divide projection, we do -z so our prespective isnt flipped
             // NOTE: move to matrix multiplication
@@ -77,12 +165,9 @@ fn main() {
                     tri_view.v2.z,
                 ),
             );
-            // skip triangles behind camera
-            if tri_view.v0.z >= 0.0 || tri_view.v1.z >= 0.0 || tri_view.v2.z >= 0.0 {
-                continue;
-            }
 
-            // apply viewport transformation
+            // apply viewport transformation, x and will will correspond to the screen, and z value
+            // will be used for z-buffering
             let tri_screen = tri_proj.viewport_transform(WIDTH as f32, HEIGHT as f32);
 
             if !is_front_facing(&tri_screen) {
@@ -90,7 +175,7 @@ fn main() {
             }
 
             // rasterization
-            rasterizer::rasterizer(&mut raster, tri_screen);
+            rasterizer::rasterizer(&mut raster, tri_screen, &mut z_buffer);
         }
 
         // update window

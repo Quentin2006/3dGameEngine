@@ -28,14 +28,15 @@ impl Triangle {
     }
 
     // assumes that the triangle is [-1, 1]
-    pub fn viewport_transform(
-        &self,
-        width: f32,
-        height: f32,
-    ) -> (super::vec2::Vec2, super::vec2::Vec2, super::vec2::Vec2) {
-        let convert =
-            |v: &Vec3| Vec2::new(((v.x + 1.0) * 0.5) * width, ((1.0 - v.y) * 0.5) * height);
-        (convert(&self.v0), convert(&self.v1), convert(&self.v2))
+    pub fn viewport_transform(&self, width: f32, height: f32) -> Triangle {
+        let convert = |v: &Vec3| {
+            Vec3::new(
+                ((v.x + 1.0) * 0.5) * width,
+                ((1.0 - v.y) * 0.5) * height,
+                v.z,
+            )
+        };
+        Triangle::new(convert(&self.v0), convert(&self.v1), convert(&self.v2))
     }
 }
 
