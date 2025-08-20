@@ -84,3 +84,17 @@ I did however complete the barycentric interpolation.
 - Clean up the code using operator overloading
 
 - Finish the camera object allowing for user movement
+
+## 📅 Week 4
+
+This was a very productive week for the rasterizer. I did end up cleaning the code, but theres
+always more I can do to clean it up. I also added movement for the camera, so you can now move around.
+I also added z-buffering and changed some of the rendering pipeline to make it more clear. Ive been
+very happy with my progress so far. I did however try to vibe-code a cube. But for some odd
+reason some of the sides of the cube are being rendered backwards, and I belive this is an error on
+chatgpts' part.
+
+### 🔜 Week 5 hopes
+
+- Add obj-import support
+- Clean up some code
