@@ -49,8 +49,8 @@ pub fn load_faces(file_name: &str, verts: Vec<Vec3>) -> Vec<Triangle> {
 
             faces.push(Triangle {
                 v0: (verts[i0 - 1]),
-                v1: (verts[i1 - 1]),
-                v2: (verts[i2 - 1]),
+                v1: (verts[i2 - 1]),
+                v2: (verts[i1 - 1]),
             })
         }
     }

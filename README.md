@@ -103,11 +103,10 @@ chatgpts' part.
 
 Obj importing was a lot simpler than I thought, only took me ~ an hour implement.
 One issue I'm running into is my winding. It was all sorts of screwed up. I had
-to change to CW winding the obj file. Now I need to swap the culling function
-so where not seeing the backside of any object.
+to change to CW winding the obj file. I fixed this by swapping the v1 and v2
+loading order in the obj loader. The preformance is fine for now.
 
 ### 🔜 Week 6 hopes
 
-- Fix the odd winding bug
-- Add parallel processing?
+- Add textures
 - Clean up some code
