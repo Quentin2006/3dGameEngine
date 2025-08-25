@@ -2,7 +2,7 @@ use minifb::Key;
 
 use super::{mat4::Mat4, vec2::Vec2, vec3::Vec3};
 
-const MOVEMENT_SPEED: f32 = 0.05;
+const MOVEMENT_SPEED: f32 = 2.25;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Camera {

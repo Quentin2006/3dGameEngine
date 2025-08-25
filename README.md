@@ -98,3 +98,16 @@ chatgpts' part.
 
 - Add obj-import support
 - Clean up some code
+
+## Week 5
+
+Obj importing was a lot simpler than I thought, only took me ~ an hour implement.
+One issue I'm running into is my winding. It was all sorts of screwed up. I had
+to change to CW winding the obj file. Now I need to swap the culling function
+so where not seeing the backside of any object.
+
+### 🔜 Week 6 hopes
+
+- Fix the odd winding bug
+- Add parallel processing?
+- Clean up some code

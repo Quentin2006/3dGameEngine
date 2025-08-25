@@ -1,4 +1,5 @@
 mod models;
+mod obj_loader;
 use core::f32;
 use std::time::{Duration, Instant};
 
@@ -6,6 +7,7 @@ use models::camera::Camera;
 use models::color::Color;
 use models::triangle::Triangle;
 use models::vec3::Vec3;
+use obj_loader::load_obj_file;
 
 mod rasterizer;
 mod window;
@@ -16,88 +18,6 @@ fn is_front_facing(tri: &Triangle) -> bool {
     (tri.v1.x - tri.v0.x) * (tri.v2.y - tri.v0.y) - (tri.v2.x - tri.v0.x) * (tri.v1.y - tri.v0.y)
         > 0.0
 }
-fn make_cube() -> Vec<Triangle> {
-    let vertices = [
-        Vec3::new(-1.0, -1.0, -1.0), // 0: left-bottom-back
-        Vec3::new(1.0, -1.0, -1.0),  // 1: right-bottom-back
-        Vec3::new(1.0, 1.0, -1.0),   // 2: right-top-back
-        Vec3::new(-1.0, 1.0, -1.0),  // 3: left-top-back
-        Vec3::new(-1.0, -1.0, 1.0),  // 4: left-bottom-front
-        Vec3::new(1.0, -1.0, 1.0),   // 5: right-bottom-front
-        Vec3::new(1.0, 1.0, 1.0),    // 6: right-top-front
-        Vec3::new(-1.0, 1.0, 1.0),   // 7: left-top-front
-    ];
-
-    vec![
-        // Back face (-Z)  — outward normal should be -Z
-        Triangle {
-            v0: vertices[2],
-            v1: vertices[1],
-            v2: vertices[0],
-        },
-        Triangle {
-            v0: vertices[3],
-            v1: vertices[2],
-            v2: vertices[0],
-        },
-        // Front face (+Z) — outward normal +Z (CCW when viewed from +Z)
-        Triangle {
-            v0: vertices[4],
-            v1: vertices[5],
-            v2: vertices[6],
-        },
-        Triangle {
-            v0: vertices[4],
-            v1: vertices[6],
-            v2: vertices[7],
-        },
-        // Left face (-X) — outward normal -X
-        Triangle {
-            v0: vertices[0],
-            v1: vertices[4],
-            v2: vertices[7],
-        },
-        Triangle {
-            v0: vertices[0],
-            v1: vertices[7],
-            v2: vertices[3],
-        },
-        // Right face (+X) — outward normal +X
-        Triangle {
-            v0: vertices[1],
-            v1: vertices[2],
-            v2: vertices[6],
-        },
-        Triangle {
-            v0: vertices[1],
-            v1: vertices[6],
-            v2: vertices[5],
-        },
-        // Top face (+Y) — outward normal +Y
-        Triangle {
-            v0: vertices[3],
-            v1: vertices[2],
-            v2: vertices[6],
-        },
-        Triangle {
-            v0: vertices[3],
-            v1: vertices[6],
-            v2: vertices[7],
-        },
-        // Bottom face (-Y) — outward normal -Y
-        Triangle {
-            v0: vertices[0],
-            v1: vertices[1],
-            v2: vertices[5],
-        },
-        Triangle {
-            v0: vertices[0],
-            v1: vertices[5],
-            v2: vertices[4],
-        },
-    ]
-}
-
 fn main() {
     let black = Color::new(0, 0, 0);
 
@@ -106,10 +26,10 @@ fn main() {
 
     let mut z_buffer: Vec<f32> = vec![f32::NEG_INFINITY; WIDTH * HEIGHT];
 
-    let mut triangles: Vec<Triangle> = make_cube();
+    let mut triangles: Vec<Triangle> = load_obj_file("src/objects/donut.obj");
 
     // NOTE: this looks in the -z direction
-    let mut camera = Camera::new(Vec3::new(0.0, 0.0, 0.0), 0.0, 0.0);
+    let mut camera = Camera::new(Vec3::new(0.0, 0.0, 500.0), 0.0, 0.0);
     let mut prev_mouse_pos = window.get_mouse_pos(minifb::MouseMode::Discard);
 
     let mut last_time = Instant::now();
@@ -142,7 +62,7 @@ fn main() {
             let tri_view = tri.transform(view);
 
             // skip triangles behind camera
-            if tri.v0.z >= 0.0 || tri_view.v1.z >= 0.0 || tri_view.v2.z >= 0.0 {
+            if tri_view.v0.z >= 0.0 || tri_view.v1.z >= 0.0 || tri_view.v2.z >= 0.0 {
                 continue;
             }
 
