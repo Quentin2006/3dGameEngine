@@ -1,7 +1,7 @@
 use crate::models::vec3::Vec3;
 use std::ops::{Add, Sub};
 
-use super::{mat4::Mat4, vec2::Vec2};
+use super::mat4::Mat4;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Triangle {
@@ -27,7 +27,6 @@ impl Triangle {
         Triangle::new(mat * self.v0, mat * self.v1, mat * self.v2)
     }
 
-    // assumes that the triangle is [-1, 1]
     pub fn viewport_transform(&self, width: f32, height: f32) -> Triangle {
         let convert = |v: &Vec3| {
             Vec3::new(
@@ -37,6 +36,12 @@ impl Triangle {
             )
         };
         Triangle::new(convert(&self.v0), convert(&self.v1), convert(&self.v2))
+    }
+
+    pub fn is_front_facing(&self) -> bool {
+        (self.v1.x - self.v0.x) * (self.v2.y - self.v0.y)
+            - (self.v2.x - self.v0.x) * (self.v1.y - self.v0.y)
+            > 0.0
     }
 }
 

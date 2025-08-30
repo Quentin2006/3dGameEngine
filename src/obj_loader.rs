@@ -43,9 +43,9 @@ pub fn load_faces(file_name: &str, verts: Vec<Vec3>) -> Vec<Triangle> {
             // we will have an array of 3 vals, each val will correspond to a vert index
 
             // get all indecies
-            let i0: usize = vals[1].parse().unwrap();
-            let i1: usize = vals[2].parse().unwrap();
-            let i2: usize = vals[3].parse().unwrap();
+            let i0: usize = vals[1].split('/').next().unwrap().parse().unwrap();
+            let i1: usize = vals[2].split('/').next().unwrap().parse().unwrap();
+            let i2: usize = vals[3].split('/').next().unwrap().parse().unwrap();
 
             faces.push(Triangle {
                 v0: (verts[i0 - 1]),
