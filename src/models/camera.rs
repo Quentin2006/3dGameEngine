@@ -66,12 +66,15 @@ impl Camera {
 
         if let Some((x, y)) = window.get_mouse_pos(minifb::MouseMode::Discard) {
             if let Some((prev_x, prev_y)) = self.prev_mouse_pos {
-                let delta_x = x - prev_x;
-                let delta_y = y - prev_y;
-                look.x += delta_x;
-                look.y -= delta_y;
+                if !(prev_x == 0.0 && prev_y == 0.0) {
+                    let delta_x = x - prev_x;
+                    let delta_y = y - prev_y;
+                    look.x += delta_x;
+                    look.y -= delta_y;
+                }
             }
         }
+
         // Apply movement
         if movement.length() > 0.0 {
             movement = movement.normalize() * MOVEMENT_SPEED;
@@ -80,6 +83,7 @@ impl Camera {
 
         // Apply look
         self.yaw += look.x;
+        self.yaw %= 360.0;
         self.pitch += look.y;
         self.pitch = self.pitch.clamp(-89.9, 89.9);
 

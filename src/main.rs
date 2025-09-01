@@ -8,6 +8,7 @@ use models::renderer::Renderer;
 use models::triangle::Triangle;
 use models::vec3::Vec3;
 use obj_loader::load_obj_file;
+use rayon::ThreadPoolBuilder;
 
 mod rasterizer;
 mod window;
@@ -19,7 +20,7 @@ fn main() {
 
     let mut window = window::init_window(WIDTH, HEIGHT, BLACK.to_u32()).0;
     let mut counter = FpsCounter::new();
-    let mut camera = Camera::new(Vec3::new(0.0, 0.0, 5.0), 0.0, 0.0);
+    let mut camera = Camera::new(Vec3::new(1000.0, 500.0, 0.0), 0.0, 180.0);
     let mut renderer = Renderer::new(WIDTH, HEIGHT);
 
     while window.is_open() {
@@ -29,6 +30,7 @@ fn main() {
 
         camera.get_movement(&window);
 
+        // renderer.render(&mut triangles, &camera);
         renderer.render(&mut triangles, &camera);
 
         // update window

@@ -87,19 +87,20 @@ I did however complete the barycentric interpolation.
 
 ## 📅 Week 4
 
-This was a very productive week for the rasterizer. I did end up cleaning the code, but theres
-always more I can do to clean it up. I also added movement for the camera, so you can now move around.
-I also added z-buffering and changed some of the rendering pipeline to make it more clear. Ive been
-very happy with my progress so far. I did however try to vibe-code a cube. But for some odd
-reason some of the sides of the cube are being rendered backwards, and I belive this is an error on
-chatgpts' part.
+This was a very productive week for the rasterizer. I did end up cleaning the
+code, but theres always more I can do to clean it up. I also added movement for
+the camera, so you can now move around. I also added z-buffering and changed
+some of the rendering pipeline to make it more clear. Ive been very happy with
+my progress so far. I did however try to vibe-code a cube. But for some odd
+reason some of the sides of the cube are being rendered backwards, and I belive
+this is an error on chatgpts' part.
 
 ### 🔜 Week 5 hopes
 
 - Add obj-import support
 - Clean up some code
 
-## Week 5
+## 📅 Week 5
 
 Obj importing was a lot simpler than I thought, only took me ~ an hour implement.
 One issue I'm running into is my winding. It was all sorts of screwed up. I had
@@ -110,3 +111,17 @@ loading order in the obj loader. The preformance is fine for now.
 
 - Add textures
 - Clean up some code
+
+## 📅 Week 6
+
+There where some issues with reading the obj files, I forgot to account for
+the textures and normals. So currently I'm just only grabbing the tri data.
+I also did some clean code cleanup, but its far from done.
+I also tried adding parallelism to the rasterizer, but I couldnt get it to work.
+I believe this is partly due to my shitty codebase, and not fully understanding
+how to use the rayon crate.
+
+### 🔜 Week 7 hopes
+
+- Clean up code
+- Add parallelism
