@@ -8,7 +8,6 @@ use models::renderer::Renderer;
 use models::triangle::Triangle;
 use models::vec3::Vec3;
 use obj_loader::load_obj_file;
-use rayon::ThreadPoolBuilder;
 
 mod rasterizer;
 mod window;
