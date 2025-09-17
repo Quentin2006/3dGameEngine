@@ -1,4 +1,6 @@
-use crate::rasterizer;
+use minifb::Window;
+
+use crate::{rasterizer, window};
 
 use super::{camera::Camera, triangle::Triangle, vec3::Vec3};
 
@@ -7,7 +9,7 @@ pub struct Renderer {
     width: usize,
     height: usize,
     z_buffer: Vec<f32>,
-    pub raster: Vec<u32>,
+    pub window: Window,
 }
 
 impl Renderer {
@@ -15,17 +17,17 @@ impl Renderer {
         Self {
             width,
             height,
+            window: window::init_window(width, height),
             z_buffer: vec![f32::NEG_INFINITY; width * height],
-            raster: vec![0; width * height],
         }
     }
 
-    pub fn clear(&mut self) {
-        self.raster.fill(0);
+    pub fn clear(&mut self, raster: &mut [u32]) {
         self.z_buffer.fill(f32::NEG_INFINITY);
+        raster.fill(0)
     }
-    pub fn render(&mut self, triangles: &mut Vec<Triangle>, camera: &Camera) {
-        self.clear();
+
+    pub fn render(&mut self, triangles: &mut Vec<Triangle>, raster: &mut [u32], camera: &Camera) {
         let view = camera.view_matrix();
         // draw triangles
         for tri in triangles {
@@ -66,7 +68,13 @@ impl Renderer {
             }
 
             // rasterization
-            rasterizer::rasterizer(&mut self.raster, tri_screen, &mut self.z_buffer);
+            rasterizer::rasterizer(raster, tri_screen, &mut self.z_buffer);
         }
+
+        self.window
+            .update_with_buffer(raster, self.width, self.height)
+            .unwrap();
+
+        self.clear(raster);
     }
 }

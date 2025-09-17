@@ -1,13 +1,9 @@
 mod models;
 mod obj_loader;
 
-use models::camera::Camera;
-use models::color::BLACK;
-use models::fps::FpsCounter;
-use models::renderer::Renderer;
-use models::triangle::Triangle;
 use models::vec3::Vec3;
-use obj_loader::load_obj_file;
+
+use crate::models::render_pipeline::RenderPipeline;
 
 mod rasterizer;
 mod window;
@@ -15,26 +11,15 @@ mod window;
 const WIDTH: usize = 1280;
 const HEIGHT: usize = 1280;
 fn main() {
-    let mut triangles: Vec<Triangle> = load_obj_file("src/objects/Velociraptor.obj");
+    // let mut counter = FpsCounter::new();
+    let mut render_pipeline = RenderPipeline::new(
+        Vec3::new(1000.0, 500.0, 0.0),
+        0.0,
+        180.0,
+        WIDTH,
+        HEIGHT,
+        "src/objects/Velociraptor.obj",
+    );
 
-    let mut window = window::init_window(WIDTH, HEIGHT, BLACK.to_u32()).0;
-    let mut counter = FpsCounter::new();
-    let mut camera = Camera::new(Vec3::new(1000.0, 500.0, 0.0), 0.0, 180.0);
-    let mut renderer = Renderer::new(WIDTH, HEIGHT);
-
-    while window.is_open() {
-        if let Some(fps) = counter.tick() {
-            println!("FPS: {fps}");
-        }
-
-        camera.get_movement(&window);
-
-        // renderer.render(&mut triangles, &camera);
-        renderer.render(&mut triangles, &camera);
-
-        // update window
-        window
-            .update_with_buffer(&renderer.raster, WIDTH, HEIGHT)
-            .unwrap();
-    }
+    render_pipeline.render_loop();
 }

@@ -121,7 +121,7 @@ I also tried adding parallelism to the rasterizer, but I couldnt get it to work.
 I believe this is partly due to my shitty codebase, and not fully understanding
 how to use the rayon crate.
 
-I've also rendered a verlocirapor. It dose only get 37fps on a 12th gen intel i5,
+I've also rendered a verlocirapor. It dose only get ~37fps on a 12th gen intel i5,
 3060ti, and 32gb of ram. But it doses look pretty cool.
 
 ![Alt text](./screenshots/FIRSTREALOBS.png)

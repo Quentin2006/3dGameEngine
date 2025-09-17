@@ -3,9 +3,9 @@ use crate::models::{triangle::Triangle, vec3::Vec3};
 /// this fucntion will load in an obj file and return a vector of triangles
 ///
 /// * `file_name`: the name of the file that will be loaded from the object folder
-pub fn load_obj_file(file_name: &str) -> Vec<Triangle> {
-    let verts = load_verts(file_name);
-    load_faces(file_name, verts)
+pub fn load_obj_file(file_path: &str) -> Vec<Triangle> {
+    let verts = load_verts(file_path);
+    load_faces(file_path, verts)
 }
 
 /// the first part of an obj file is the vertices, we will load these in memory

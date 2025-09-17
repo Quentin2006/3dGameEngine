@@ -1,5 +1,6 @@
 use std::time::{Duration, Instant};
 
+#[derive(Debug)]
 pub struct FpsCounter {
     last_time: Instant,
     frames: u32,
