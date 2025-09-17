@@ -1,0 +1,1 @@
+(std::rc::Rc<std::cell::RefCell<std::option::Option<(i32, i32)>>>, std::rc::Rc<std::cell::RefCell<bool>>)

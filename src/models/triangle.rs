@@ -1,7 +1,5 @@
-use crate::models::vec3::Vec3;
+use crate::models::{mat4::Mat4, vec3::Vec3};
 use std::ops::{Add, Sub};
-
-use super::mat4::Mat4;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Triangle {

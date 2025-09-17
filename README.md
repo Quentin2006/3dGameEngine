@@ -130,3 +130,14 @@ I've also rendered a verlocirapor. It dose only get ~37fps on a 12th gen intel i
 
 - Clean up code
 - Add parallelism
+
+## 📅 Week 7
+
+Added some shitty parallelism, now where getting ~50fps, so minor increases.
+Could 100% better optimize it, but Ive spend long enough on this,
+and would like to tackle
+a new feature
+
+### 🔜 Week 8 hopes
+
+- SHADING!!!

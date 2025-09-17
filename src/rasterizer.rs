@@ -12,39 +12,73 @@ struct BoundingBoxData(usize, usize, usize, usize);
 ///
 /// * `raster`: raster to draw to
 /// * `(v0, v1, v2)`: tuple of vec3's to draw the triangle from
-pub fn rasterizer(raster: &mut [u32], tri: Triangle, z_buffer: &mut [f32]) {
+pub fn rasterizer(
+    raster_chunk: &mut [u32],
+    tri: Triangle,
+    z_chunk: &mut [f32],
+    start_index: usize,
+    end_index: usize,
+) {
     let v0 = Vec2::new(tri.v0.x, tri.v0.y);
     let v1 = Vec2::new(tri.v1.x, tri.v1.y);
     let v2 = Vec2::new(tri.v2.x, tri.v2.y);
 
-    let BoundingBoxData(min_x, min_y, max_x, max_y): BoundingBoxData = bounding_box(v0, v1, v2);
+    let BoundingBoxData(mut min_x, mut min_y, mut max_x, mut max_y) = bounding_box(v0, v1, v2);
 
-    for x in min_x..=max_x {
-        for y in min_y..=max_y {
-            if point_in_triangle(x, y, (v0, v1, v2)) {
-                // calculate barycentric coordinates
-                let (u, v, w) = barycentric_coords(v0, v1, v2, Vec2::new(x as f32, y as f32));
+    // clamp to screen
+    if (min_x as isize) < 0 {
+        min_x = 0;
+    }
+    if (min_y as isize) < 0 {
+        min_y = 0;
+    }
+    if max_x >= WIDTH {
+        max_x = WIDTH - 1;
+    }
+    if max_y >= HEIGHT {
+        max_y = HEIGHT - 1;
+    }
 
-                // interpolate z value
-                let z = u * tri.v0.z + v * tri.v1.z + w * tri.v2.z;
+    // compute the triangle's global start/end indices (inclusive ranges)
+    let tri_start = min_y * WIDTH + min_x;
+    let tri_end = max_y * WIDTH + max_x + 1; // make tri_end exclusive
 
-                // chec if point is in front of the triangle, REMOMVER, CAMERA SEES in -Z
-                // DIRECTION, so bigger vals are furether
-                if z > z_buffer[y * WIDTH + x] {
-                    // write to z buffer
-                    z_buffer[y * WIDTH + x] = z;
+    // do they overlap?
+    if tri_end <= start_index || tri_start >= end_index {
+        return;
+    }
 
-                    let interpolated_color = interpolate_color(
-                        v0,
-                        v1,
-                        v2,
-                        color::RED,
-                        color::GREEN,
-                        color::BLUE,
-                        Vec2::new(x as f32, y as f32),
-                    );
-                    draw_pixel(x, y, raster, interpolated_color);
-                }
+    for y in min_y..=max_y {
+        for x in min_x..=max_x {
+            if !point_in_triangle(x, y, (v0, v1, v2)) {
+                continue;
+            }
+
+            // barycentric / depth
+            let (u, v, w) = barycentric_coords(v0, v1, v2, Vec2::new(x as f32, y as f32));
+            let z = u * tri.v0.z + v * tri.v1.z + w * tri.v2.z;
+
+            let global_idx = y * WIDTH + x;
+
+            // only handle pixels that belong to this chunk
+            if global_idx < start_index || global_idx >= end_index {
+                continue;
+            }
+
+            let local_idx = global_idx - start_index; // index into the small chunk slice
+
+            if z > z_chunk[local_idx] {
+                z_chunk[local_idx] = z;
+                raster_chunk[local_idx] = interpolate_color(
+                    v0,
+                    v1,
+                    v2,
+                    color::RED,
+                    color::GREEN,
+                    color::BLUE,
+                    Vec2::new(x as f32, y as f32),
+                )
+                .to_u32();
             }
         }
     }

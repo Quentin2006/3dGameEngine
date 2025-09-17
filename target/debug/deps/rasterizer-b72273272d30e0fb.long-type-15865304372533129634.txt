@@ -1,0 +1,1 @@
+for<'a, 'b, 'c> fn(&'a models::triangle::Triangle, &'b mut [f32], &'c mut [u32], usize, usize, models::mat4::Mat4, usize, usize)

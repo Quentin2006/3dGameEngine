@@ -8,8 +8,8 @@ use crate::models::render_pipeline::RenderPipeline;
 mod rasterizer;
 mod window;
 
-const WIDTH: usize = 1280;
-const HEIGHT: usize = 1280;
+pub const WIDTH: usize = 1280;
+pub const HEIGHT: usize = 1280;
 fn main() {
     // let mut counter = FpsCounter::new();
     let mut render_pipeline = RenderPipeline::new(
