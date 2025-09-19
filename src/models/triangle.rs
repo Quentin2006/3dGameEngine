@@ -13,14 +13,6 @@ impl Triangle {
         Self { v0, v1, v2 }
     }
 
-    pub fn random(min_x: f32, min_y: f32, min_z: f32, max_x: f32, max_y: f32, max_z: f32) -> Self {
-        Triangle::new(
-            Vec3::random(min_x, min_y, min_z, max_x, max_y, max_z),
-            Vec3::random(min_x, min_y, min_z, max_x, max_y, max_z),
-            Vec3::random(min_x, min_y, min_z, max_x, max_y, max_z),
-        )
-    }
-
     pub fn transform(self, mat: Mat4) -> Triangle {
         Triangle::new(mat * self.v0, mat * self.v1, mat * self.v2)
     }

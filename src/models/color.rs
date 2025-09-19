@@ -11,26 +11,11 @@ impl Color {
         Self { r, g, b }
     }
 
-    pub fn update(&mut self, r: u8, g: u8, b: u8) {
-        self.r = r;
-        self.g = g;
-        self.b = b;
-    }
-
     pub fn to_u32(self) -> u32 {
         (self.r as u32) << 16 | (self.g as u32) << 8 | (self.b as u32)
-    }
-
-    pub fn from_u32(value: u32) -> Self {
-        Self {
-            r: ((value >> 16) & 0xFF) as u8,
-            g: ((value >> 8) & 0xFF) as u8,
-            b: (value & 0xFF) as u8,
-        }
     }
 }
 
 pub const RED: Color = Color { r: 255, g: 0, b: 0 };
 pub const GREEN: Color = Color { r: 0, g: 255, b: 0 };
 pub const BLUE: Color = Color { r: 0, g: 0, b: 255 };
-pub const BLACK: Color = Color { r: 0, g: 0, b: 0 };

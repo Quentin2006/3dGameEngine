@@ -1,5 +1,3 @@
-use std::ops::Mul;
-
 use super::vec3::Vec3;
 
 #[derive(Debug, Clone, Copy)]
@@ -18,32 +16,6 @@ impl Mat4 {
                 [0.0, 0.0, 0.0, 1.0],
             ],
         }
-    }
-
-    /// Creates a translation matrix
-    fn translate(tx: f32, ty: f32, tz: f32) -> Mat4 {
-        let mut mat = Mat4::identity();
-        mat.data[0][3] = tx;
-        mat.data[1][3] = ty;
-        mat.data[2][3] = tz;
-        mat
-    }
-
-    /// Multiplies two Mat4 matrices (self * other)
-    pub fn mul(&self, other: &Mat4) -> Mat4 {
-        let mut result = Mat4 {
-            data: [[0.0; 4]; 4],
-        };
-
-        for row in 0..4 {
-            for col in 0..4 {
-                for i in 0..4 {
-                    result.data[row][col] += self.data[row][i] * other.data[i][col];
-                }
-            }
-        }
-
-        result
     }
 
     /// Builds a simple LookAt matrix

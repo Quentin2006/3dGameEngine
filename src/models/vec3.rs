@@ -1,4 +1,3 @@
-use rand::prelude::*;
 use std::ops::{Add, Mul, Sub};
 
 #[derive(Debug, Clone, Copy)]
@@ -13,12 +12,6 @@ impl Vec3 {
         Self { x, y, z }
     }
 
-    pub fn update(&mut self, x: f32, y: f32, z: f32) {
-        self.x = x;
-        self.y = y;
-        self.z = z;
-    }
-
     pub fn dot(&self, other: &Vec3) -> f32 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
@@ -28,14 +21,6 @@ impl Vec3 {
             x: self.y * other.z - self.z * other.y,
             y: self.z * other.x - self.x * other.z,
             z: self.x * other.y - self.y * other.x,
-        }
-    }
-
-    pub fn scale(&self, scalar: f32) -> Vec3 {
-        Vec3 {
-            x: self.x * scalar,
-            y: self.y * scalar,
-            z: self.z * scalar,
         }
     }
 
@@ -53,15 +38,6 @@ impl Vec3 {
             y: self.y / len,
             z: self.z / len,
         }
-    }
-
-    pub fn random(min_x: f32, min_y: f32, min_z: f32, max_x: f32, max_y: f32, max_z: f32) -> Self {
-        let mut rng = rand::rng();
-        Vec3::new(
-            rng.random_range(min_x..=max_x),
-            rng.random_range(min_y..=max_y),
-            rng.random_range(min_z..=max_z),
-        )
     }
 }
 
