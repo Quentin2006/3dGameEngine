@@ -5,7 +5,12 @@ use crate::models::{triangle::Triangle, vec3::Vec3};
 /// * `file_name`: the name of the file that will be loaded from the object folder
 pub fn load_obj_file(file_path: &str) -> Vec<Triangle> {
     let verts = load_verts(file_path);
-    load_faces(file_path, verts)
+    let vert_count = verts.len();
+    let faces = load_faces(file_path, verts);
+    let faces_count = faces.len();
+
+    println!("{file_path} has {vert_count} verts and {faces_count} faces");
+    faces
 }
 
 /// the first part of an obj file is the vertices, we will load these in memory

@@ -13,7 +13,7 @@ impl Triangle {
         Self { v0, v1, v2 }
     }
 
-    pub fn transform(self, mat: Mat4) -> Triangle {
+    pub fn transform(&self, mat: Mat4) -> Triangle {
         Triangle::new(mat * self.v0, mat * self.v1, mat * self.v2)
     }
 

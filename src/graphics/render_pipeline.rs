@@ -1,11 +1,7 @@
-use core::f32;
-
-// inside render_pipeline.rs
-
-use rayon::prelude::*;
+use {core::f32, rayon::prelude::*};
 
 use crate::{
-    WIDTH,
+    HEIGHT, WIDTH,
     camera::camera::Camera,
     graphics::renderer::{Renderer, render_tri},
     loaders::obj_loader::load_obj_file,
@@ -13,6 +9,14 @@ use crate::{
     models::{triangle::Triangle, vec3::Vec3},
 };
 
+/// Runs the main render loop, managing the camera, renderer, and frame data.
+///
+/// * `camera`: the camera used for view transformations
+/// * `renderer`: the renderer responsible for drawing to the window
+/// * `tris`: the triangles loaded from the OBJ file
+/// * `raster`: the raster buffer storing pixel color data
+/// * `z_buffer`: the z-buffer for depth testing
+/// * `fps_counter`: the FPS counter for performance monitoring
 #[derive(Debug)]
 pub struct RenderPipeline {
     camera: Camera,
@@ -42,6 +46,8 @@ impl RenderPipeline {
         }
     }
 
+    /// runs the main render loop, handling camera movement, rendering triangles, and displaying
+    /// the frame.
     pub fn render_loop(&mut self) {
         while self.renderer.window.is_open() {
             if let Some(fps) = self.fps_counter.tick() {
@@ -54,8 +60,10 @@ impl RenderPipeline {
             let tris = &self.tris;
             let view = self.camera.view_matrix();
 
-            let rows_per_chunk = 100;
+            const THREADS: usize = 12;
+            let rows_per_chunk = HEIGHT / THREADS;
             let chunk_size = WIDTH * rows_per_chunk;
+
             z_buffer
                 .par_chunks_mut(chunk_size)
                 .zip(raster.par_chunks_mut(chunk_size))
@@ -65,7 +73,8 @@ impl RenderPipeline {
                     let end = start + raster_chunk.len(); // last chunk may be smaller
 
                     for tri in tris.iter() {
-                        render_tri(tri, z_chunk, raster_chunk, start, end, view);
+                        let tri = tri.transform(view);
+                        render_tri(&tri, z_chunk, raster_chunk, start, end);
                     }
                 });
 

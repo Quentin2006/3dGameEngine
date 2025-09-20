@@ -47,31 +47,16 @@ pub fn render_tri(
     raster_chunk: &mut [u32],
     start_index: usize,
     end_index: usize,
-    view: Mat4,
 ) {
-    let tri_view = tri.transform(view);
-
     // triangles must be in front of camera (your convention)
-    if tri_view.v0.z >= 0.0 || tri_view.v1.z >= 0.0 || tri_view.v2.z >= 0.0 {
+    if tri.v0.z >= 0.0 || tri.v1.z >= 0.0 || tri.v2.z >= 0.0 {
         return;
     }
 
     let tri_proj = Triangle::new(
-        Vec3::new(
-            tri_view.v0.x / -tri_view.v0.z,
-            tri_view.v0.y / -tri_view.v0.z,
-            tri_view.v0.z,
-        ),
-        Vec3::new(
-            tri_view.v1.x / -tri_view.v1.z,
-            tri_view.v1.y / -tri_view.v1.z,
-            tri_view.v1.z,
-        ),
-        Vec3::new(
-            tri_view.v2.x / -tri_view.v2.z,
-            tri_view.v2.y / -tri_view.v2.z,
-            tri_view.v2.z,
-        ),
+        Vec3::new(tri.v0.x / -tri.v0.z, tri.v0.y / -tri.v0.z, tri.v0.z),
+        Vec3::new(tri.v1.x / -tri.v1.z, tri.v1.y / -tri.v1.z, tri.v1.z),
+        Vec3::new(tri.v2.x / -tri.v2.z, tri.v2.y / -tri.v2.z, tri.v2.z),
     );
 
     let tri_screen = tri_proj.viewport_transform(WIDTH as f32, HEIGHT as f32);
@@ -79,6 +64,5 @@ pub fn render_tri(
     if !tri_screen.is_front_facing() {
         return;
     }
-
-    rasterizer::rasterizer(raster_chunk, tri_screen, z_chunk, start_index, end_index);
+    rasterizer::rasterizer(raster_chunk, &tri_screen, z_chunk, start_index, end_index);
 }
