@@ -1,22 +1,11 @@
-use {core::f32, rayon::prelude::*};
-
 use crate::{
-    HEIGHT, WIDTH,
     camera::camera::Camera,
-    graphics::renderer::{Renderer, render_tri},
+    graphics::renderer::Renderer,
     loaders::obj_loader::load_obj_file,
     logging::fps::FpsCounter,
     models::{triangle::Triangle, vec3::Vec3},
 };
 
-/// Runs the main render loop, managing the camera, renderer, and frame data.
-///
-/// * `camera`: the camera used for view transformations
-/// * `renderer`: the renderer responsible for drawing to the window
-/// * `tris`: the triangles loaded from the OBJ file
-/// * `raster`: the raster buffer storing pixel color data
-/// * `z_buffer`: the z-buffer for depth testing
-/// * `fps_counter`: the FPS counter for performance monitoring
 #[derive(Debug)]
 pub struct RenderPipeline {
     camera: Camera,
@@ -46,38 +35,26 @@ impl RenderPipeline {
         }
     }
 
-    /// runs the main render loop, handling camera movement, rendering triangles, and displaying
-    /// the frame.
     pub fn render_loop(&mut self) {
         while self.renderer.window.is_open() {
+            // Update FPS
             if let Some(fps) = self.fps_counter.tick() {
                 println!("FPS: {fps}");
             }
+
+            // Handle camera movement
             self.camera.get_movement(&self.renderer.window);
 
-            let raster = &mut self.raster;
-            let z_buffer = &mut self.z_buffer;
-            let tris = &self.tris;
             let view = self.camera.view_matrix();
 
-            const THREADS: usize = 12;
-            let rows_per_chunk = HEIGHT / THREADS;
-            let chunk_size = WIDTH * rows_per_chunk;
+            // Render all triangles
+            for tri in &self.tris {
+                let tri_view = tri.transform(view);
+                self.renderer
+                    .render_tri(&tri_view, &mut self.z_buffer, &mut self.raster);
+            }
 
-            z_buffer
-                .par_chunks_mut(chunk_size)
-                .zip(raster.par_chunks_mut(chunk_size))
-                .enumerate()
-                .for_each(|(i, (z_chunk, raster_chunk))| {
-                    let start = i * chunk_size;
-                    let end = start + raster_chunk.len(); // last chunk may be smaller
-
-                    for tri in tris.iter() {
-                        let tri = tri.transform(view);
-                        render_tri(&tri, z_chunk, raster_chunk, start, end);
-                    }
-                });
-
+            // Draw the frame and clear buffers
             self.renderer
                 .draw_raster(&mut self.raster, &mut self.z_buffer);
         }
